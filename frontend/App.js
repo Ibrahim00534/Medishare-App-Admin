@@ -2,7 +2,7 @@ import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 
-// PATIENTS SCREENS
+// PATIENTS SCREEN
 import PatientLoginScreen from './screens/Patient/PatientLoginScreen';
 import PatientSignupScreen from './screens/Patient/PatientSignupScreen';
 import PatientDashboardScreen from './screens/Patient/PatientDashboardScreen';
