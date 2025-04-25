@@ -82,12 +82,12 @@ const Requests = () => {
     try {
       const requestRef = doc(db, 'PatientRequests', request.id);
       await updateDoc(requestRef, { status: newStatus });
-  
+
       const message =
         newStatus === 'Approved'
           ? `Your request for ${request.medicineName} has been approved.`
           : `Your request for ${request.medicineName} has been rejected.`;
-  
+
       const notification = {
         requestId: request.id,
         medicineName: request.medicineName,
@@ -95,12 +95,12 @@ const Requests = () => {
         message,
         time: Timestamp.now(),
       };
-  
+
       const patientRef = doc(db, 'patients', request.requestedBy);
       await updateDoc(patientRef, {
         notifications: arrayUnion(notification),
       });
-  
+
       // ✅ If approved, save to 'orders' collection
       if (newStatus === 'Approved') {
         const ordersRef = collection(db, 'orders');
@@ -110,7 +110,7 @@ const Requests = () => {
           orderCreatedAt: Timestamp.now(),
         });
       }
-  
+
       // Optimistically update UI
       setRequests((prev) =>
         prev.map((r) =>
@@ -122,7 +122,7 @@ const Requests = () => {
       alert('Failed to update request.');
     }
   };
-  
+
   const sortedRequests = [...requests]
     .sort((a, b) => (priorityOrder[a.priority] || 99) - (priorityOrder[b.priority] || 99))
     .filter((request) => filter === 'All' || request.priority === filter);
@@ -155,6 +155,7 @@ const Requests = () => {
               <th>Medicine</th>
               <th>Status</th>
               <th>Priority</th>
+              <th>Prescription</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -167,10 +168,10 @@ const Requests = () => {
                 <td>
                   <span
                     className={`badge ${request.status === 'Pending'
-                        ? 'bg-warning'
-                        : request.status === 'Approved'
-                          ? 'bg-success'
-                          : 'bg-danger'
+                      ? 'bg-warning'
+                      : request.status === 'Approved'
+                        ? 'bg-success'
+                        : 'bg-danger'
                       }`}
                   >
                     {request.status}
@@ -178,6 +179,13 @@ const Requests = () => {
                 </td>
                 <td>
                   <span className="badge bg-info">{request.priority}</span>
+                </td>
+                <td>
+                  <img
+                    src={request.prescriptionImageUrl || 'https://via.placeholder.com/80x80.png?text=No+Image'}
+                    alt="med"
+                    style={{ width: 80, height: 80, objectFit: 'cover', borderRadius: 8 }}
+                  />
                 </td>
                 <td>
                   <button
@@ -221,6 +229,11 @@ const Requests = () => {
                 ></button>
               </div>
               <div className="modal-body">
+                <img
+                  src={selectedRequest.prescriptionImageUrl || 'https://via.placeholder.com/80x80.png?text=No+Image'}
+                  alt="med"
+                  style={{ width: 280, height: 280, objectFit: 'cover', borderRadius: 8 }}
+                />
                 <p><strong>Patient Name:</strong> {selectedRequest.patientName}</p>
                 <p><strong>Patient Email:</strong> {selectedRequest.patientEmail}</p>
                 <p><strong>Patient Mobile:</strong> {selectedRequest.patientMobile}</p>
